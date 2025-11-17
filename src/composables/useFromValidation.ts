@@ -92,6 +92,19 @@ export function useFormValidation(config: FormConfig){
         return isFormValid.value
     }
 
+    function resetForm(): void{
+        Object.entries(config.fields).forEach(([fieldName, fieldConfig]) => {
+            const field = formState.fields[fieldName]
+            if (field) {
+                field.value = fieldConfig.initialValue
+                field.error = null
+                field.isTouched = false
+                field.isDirty = false
+                field.isValid = true
+            }
+        })
+    }
+
     return {
         formState,
         isFormDirty,
@@ -100,6 +113,7 @@ export function useFormValidation(config: FormConfig){
         setFieldValue,
         getFieldError,
         validateField,
-        validateForm
+        validateForm,
+        resetForm
     }
 }
