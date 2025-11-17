@@ -1,4 +1,4 @@
-import { computed, reactive } from "vue"
+import { computed, reactive, watchEffect } from "vue"
 import type { FormConfig, FormState } from "../types/Types"
 
 export function useFormValidation(config: FormConfig){
@@ -8,7 +8,7 @@ export function useFormValidation(config: FormConfig){
         isDirty: false
     })
 
-    Object.entries(config).forEach(([fieldName, fieldConfig]) => {
+    Object.entries(config.fields).forEach(([fieldName, fieldConfig]) => {
         formState.fields[fieldName] = {
             value: fieldConfig.initialValue,
             error: null,
@@ -24,6 +24,11 @@ export function useFormValidation(config: FormConfig){
 
     const isFormDirty = computed(() => {
         return Object.values(formState.fields).some((field) => field.isDirty)
+    })
+
+    watchEffect(() => {
+        formState.isValid = isFormValid.value
+        formState.isDirty = isFormDirty.value
     })
 
     return {
