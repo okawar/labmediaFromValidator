@@ -52,6 +52,27 @@ export function useFormValidation(config: FormConfig){
         return null
     }
 
+    function validateField(fieldName: string): boolean {
+        const fieldConfig = config.fields[fieldName]
+        if (!fieldConfig) return false
+        
+        const fieldState = formState.fields[fieldName]
+        if (!fieldState) return false
+        const currentValue = fieldState?.value
+
+        for (const rule of fieldConfig?.rules){
+            const result = rule(currentValue)
+            if (typeof result === "string") {
+                fieldState.error = result
+                fieldState.isValid = false
+                return false
+            }
+        }
+        fieldState.error = null
+        fieldState.isValid = true
+        return true
+    }
+
     return {
         formState,
         isFormDirty,
