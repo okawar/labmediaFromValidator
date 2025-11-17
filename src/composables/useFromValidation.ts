@@ -31,9 +31,33 @@ export function useFormValidation(config: FormConfig){
         formState.isDirty = isFormDirty.value
     })
 
+    function setFieldValue(fieldName: string, value: any): void{
+        const field = formState.fields[fieldName]
+        if (field){
+            field.value = value
+            field.isDirty = true
+        }
+    }
+
+    function setFieldTouched(fieldName: string, touched: boolean = true): void{
+        const field = formState.fields[fieldName]
+        if (field){
+            field.isTouched = touched
+        }
+    }
+
+    function getFieldError(fieldName: string): string | null{
+        const field = formState.fields[fieldName]
+        if(field?.error) return field.error
+        return null
+    }
+
     return {
         formState,
         isFormDirty,
-        isFormValid
+        isFormValid,
+        setFieldTouched,
+        setFieldValue,
+        getFieldError
     }
 }
