@@ -37,12 +37,22 @@ export function useFormValidation(config: FormConfig){
             field.value = value
             field.isDirty = true
         }
+
+        const fieldConfig = config.fields[fieldName]
+        if (fieldConfig && fieldConfig.validationOn === "change"){
+            validateField(fieldName)
+        }
     }
 
     function setFieldTouched(fieldName: string, touched: boolean = true): void{
         const field = formState.fields[fieldName]
         if (field){
             field.isTouched = touched
+        }
+
+        const fieldConfig = config.fields[fieldName]
+        if (fieldConfig && fieldConfig.validationOn === "blur" && touched === true){
+            validateField(fieldName)
         }
     }
 
@@ -58,9 +68,9 @@ export function useFormValidation(config: FormConfig){
         
         const fieldState = formState.fields[fieldName]
         if (!fieldState) return false
-        const currentValue = fieldState?.value
+        const currentValue = fieldState.value
 
-        for (const rule of fieldConfig?.rules){
+        for (const rule of fieldConfig.rules){
             const result = rule(currentValue)
             if (typeof result === "string") {
                 fieldState.error = result
@@ -73,12 +83,23 @@ export function useFormValidation(config: FormConfig){
         return true
     }
 
+    function validateForm(): boolean{
+        Object.entries(formState.fields).forEach(([fieldName, fieldState]) => {
+            validateField(fieldName)
+            const field = formState.fields[fieldName]
+            if (field) field.isTouched = true
+        })
+        return isFormValid.value
+    }
+
     return {
         formState,
         isFormDirty,
         isFormValid,
         setFieldTouched,
         setFieldValue,
-        getFieldError
+        getFieldError,
+        validateField,
+        validateForm
     }
 }
